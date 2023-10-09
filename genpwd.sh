@@ -22,7 +22,7 @@ storage_path="$HOME/.config/genpwd"
 words_file="$storage_path/genpwd-words.txt"
 
 
-# Check for --regen option among other arguments
+# Check for --regen option among the arguments
 for arg in "$@"; do
   if [ "$arg" == "--regen" ]; then
     regen=true
@@ -30,26 +30,20 @@ for arg in "$@"; do
   fi
 done
 
-# If words file doesnt exist, download it using wget
-if ! [ -r $words_file ]; then
+# If words file doesn't exist or --regen is true, download it using wget
+if ! [ -r $words_file ] || [ "$regen" = true ]; then
     # Create the directory if it doesn't exist
     if [ ! -d "$storage_path" ]; then
       mkdir -p "$storage_path"
     fi
-    echo "Downloading words file..."
-    wget -O "$words_file" "https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english-no-swears.txt"
-    if [ $? -ne 0 ]; then
-        echo "Download failed."
-        exit 1
+    # Determine the reason for downloading
+    if [ "$regen" = true ]; then
+        echo "Downloading new words file..."
+    else
+        echo "Downloading words file..."
     fi
-    echo "Download complete."
-    exit 0
-fi
-
-# If --regen is true, download new words file using wget
-if [ "$regen" = true ]; then
-    echo "Downloading new words file..."
     wget -O "$words_file" "https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english-no-swears.txt"
+    # Check if the download was successful
     if [ $? -ne 0 ]; then
         echo "Download failed."
         exit 1
