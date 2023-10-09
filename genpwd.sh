@@ -7,7 +7,7 @@ display_help() {
     echo "Options:"
     echo "  -n  Number of passwords to generate (default is 1)."
     echo "  -l  Minimum length of the words (default is 4)."
-    echo "  -m  Maximum length of the words (default is the minimum length + 3)."
+    echo "  -m  Maximum length of the words (default is the current minimum length + 3)."
     echo "  -r  Maximum number of retries for each word (default is 30)."
     echo "  --regen  Download the latest words file."
 }
