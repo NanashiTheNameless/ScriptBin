@@ -5,6 +5,7 @@ display_help() {
     echo "Usage: ${0##*/} [-n number_of_passwords] [-l min_word_length] [-r max_retries] [--regen]"
     echo "Generate random passwords based on words and numbers."
     echo "Options:"
+    echo "  -s  Enable 'Super Mode' which will create longer passwords."
     echo "  -n  Number of passwords to generate (default is 1)."
     echo "  -l  Minimum length of the words (default is 4)."
     echo "  -m  Maximum length of the words (default is the current minimum length + 3)."
@@ -13,19 +14,19 @@ display_help() {
 }
 
 # Initialize default values
-times_to_run=1
-min_word_length=4
-max_word_length=$((min_word_length + 3))
-max_retries=30
-regen=false
+longer="false"
+times_to_run="1"
+min_word_length="4"
+max_word_length="$((min_word_length + 3))"
+max_retries="30"
+regen="false"
 storage_path="$HOME/.config/genpwd"
 words_file="$storage_path/genpwd-words.txt"
-
 
 # Check for --regen option among the arguments
 for arg in "$@"; do
   if [ "$arg" == "--regen" ]; then
-    regen=true
+    regen="true"
     break
   fi
 done
@@ -58,8 +59,11 @@ if [ "$regen" = true ]; then
 fi
 
 # Parse command line arguments for standard flags
-while getopts ":n:l:m:r:h" opt; do
+while getopts ":sn:l:m:r:h" opt; do
   case $opt in
+    s)
+        longer="true"
+      ;;
     n) 
       if [[ "$OPTARG" =~ ^[0-9]+$ ]]; then
         times_to_run="$OPTARG"
@@ -92,9 +96,12 @@ while getopts ":n:l:m:r:h" opt; do
         exit 1
       fi
       ;;
-    h) display_help; exit 0;;
-    \?) echo "Invalid option -$OPTARG" >&2; exit 1;;
-  esac
+    h) 
+      display_help; exit 0
+      ;;
+    \?) echo "Invalid option -$OPTARG" >&2; exit 1
+    ;;
+    esac
 done
 
 # Check the option validity
@@ -137,31 +144,34 @@ fi
 
 # Loop to run the script the specified number of times
 for ((i=1; i<=times_to_run; i++)); do
-
-#     # Generate three random words
-#     word1=$(get_word_from_file)
-#     word2=$(get_word_from_file)
-#     word3=$(get_word_from_file)
-# 
-#     # Generate two random numbers
-#     number=$(shuf -i 10-999 -n 1)
-#     number2=$(shuf -i 10-999 -n 1)
-# 
-#     # Echo the random string
-#     echo ""
-#     echo "$word1$number$word2$number2$word3"
-#     echo ""
-
-    # Generate two random words
-    word1=$(get_word_from_file)
-    word2=$(get_word_from_file)
-
-    # Generate a random number
-    number=$(shuf -i 10-999 -n 1)
-
-    # Echo the random string
-    echo ""
-    echo "$word1$number$word2"
-    echo ""
+    if [ "$longer" = "true" ]; then
+    
+        # Generate three random words
+        words1=$(get_word_from_file)
+        words2=$(get_word_from_file)
+        words3=$(get_word_from_file)
+        
+        # Generate two random numbers
+        numbers1=$(shuf -i 10-999 -n 1)
+        numbers2=$(shuf -i 10-999 -n 1)
+        
+        # Echo the random string
+        echo ""
+        echo "$words1$numbers1$words2$numbers2$words3"
+        echo ""
+    else
+    
+        # Generate two random words
+        words1=$(get_word_from_file)
+        words2=$(get_word_from_file)
+        
+        # Generate a random number
+        numbers1=$(shuf -i 10-999 -n 1)
+        
+        # Echo the random string
+        echo ""
+        echo "$words1$numbers1$words2"
+        echo ""
+    fi
 done
 exit 0
